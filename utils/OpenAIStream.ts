@@ -21,6 +21,7 @@ export interface OpenAIStreamPayload {
   max_tokens: number;
   stream: boolean;
   n: number;
+  response_format?: { type: "json_object" | "text" };
 }
 
 export async function OpenAIStream(payload: OpenAIStreamPayload) {
