@@ -23,7 +23,7 @@ export function DragHandle({ color = 'currentColor' }: { color?: string }) {
 interface EditableTextProps {
   path: string;
   value: string;
-  as?: string;
+  as?: keyof JSX.IntrinsicElements;
   className?: string;
   style?: React.CSSProperties;
   multiline?: boolean;
@@ -54,21 +54,20 @@ export default function EditableText({
 
   // ── Print / non-edit mode ───────────────────────────────────────────────
   if (!onEdit) {
-    return (
-      // @ts-ignore dynamic tag
-      <Tag className={className} style={style}>
-        {value}
-      </Tag>
-    );
+    const PrintTag = Tag as keyof JSX.IntrinsicElements;
+    const El = PrintTag as React.ElementType;
+    return <El className={className} style={style}>{value}</El>;
   }
 
-  // ── Editable mode ──────────────────────────────────────────────────────
+  // ── Editable mode — use a span/div with a properly typed ref ────────────
+  // We use span for inline and div for multiline to avoid dynamic tag + ref
+  // TypeScript incompatibility. Display is controlled via style.
+  const EditEl = multiline ? 'div' : 'span';
+
   return (
-    // @ts-ignore dynamic tag
-    <Tag
-      ref={(el: HTMLElement | null) => {
+    <EditEl
+      ref={(el: HTMLSpanElement | HTMLDivElement | null) => {
         ref.current = el;
-        // Set initial content on mount
         if (el) {
           if (multiline) {
             el.innerHTML = (value || '').replace(/\n/g, '<br>');
@@ -86,7 +85,7 @@ export default function EditableText({
         cursor: 'text',
         borderRadius: '2px',
         transition: 'background 0.15s, box-shadow 0.15s',
-        display: 'inline',
+        display: multiline ? 'block' : 'inline',
         wordBreak: 'break-word',
       }}
       onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {

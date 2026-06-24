@@ -117,7 +117,7 @@ export function updatePath(data: ResumeData, path: string, value: string): Resum
     const section = parts[0] as 'experience' | 'education' | 'projects' | 'certifications';
     const idx = parseInt(parts[1]);
     const field = parts[2];
-    const arr = (data[section] as Record<string, unknown>[]).map((item, i) =>
+    const arr = (data[section] as unknown as Record<string, unknown>[]).map((item, i) =>
       i === idx ? { ...item, [field]: value } : item
     );
     return { ...data, [section]: arr };
