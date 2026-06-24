@@ -158,19 +158,70 @@ export default function TemplateSlate({ data }: { data: ResumeData }) {
     }
   };
 
+  const custom = data.customization || {
+    fontFamily: 'Inter',
+    primaryColor: '#6366f1',
+    headingColor: '#312e81',
+    textColor: '#1f2937',
+    bgColor: '#ffffff',
+  };
+
   return (
-    <div className="p-8 bg-white text-black font-sans" style={{ width: "100%", minHeight: "100%" }}>
+    <div className="p-8 bg-white text-black resume-custom-container" style={{ width: "100%", minHeight: "100%" }}>
+      <style>{`
+        .resume-custom-container {
+          font-family: ${custom.fontFamily || 'Inter'}, sans-serif !important;
+          background-color: ${custom.bgColor || '#ffffff'} !important;
+          color: ${custom.textColor || '#1f2937'} !important;
+        }
+        .resume-custom-container h1,
+        .resume-custom-container h2,
+        .resume-custom-container .resume-section-heading {
+          color: ${custom.headingColor || '#000000'} !important;
+          border-color: ${custom.primaryColor || '#000000'} !important;
+        }
+        .resume-custom-container h3,
+        .resume-custom-container .text-indigo-600,
+        .resume-custom-container .text-blue-600 {
+          color: ${custom.primaryColor || '#6366f1'} !important;
+        }
+        .resume-custom-container p,
+        .resume-custom-container span,
+        .resume-custom-container div,
+        .resume-custom-container li {
+          color: ${custom.textColor || '#1f2937'} !important;
+        }
+        .resume-custom-container .text-gray-400 {
+          color: ${custom.primaryColor || '#9ca3af'} !important;
+          opacity: 0.5;
+        }
+        .resume-custom-container .border-indigo-500,
+        .resume-custom-container .border-blue-500,
+        .resume-custom-container .border-black {
+          border-color: ${custom.primaryColor || '#6366f1'} !important;
+        }
+      `}</style>
       {/* Header */}
-      <div className="text-center mb-5">
-        <h1 className="text-[22px] font-bold uppercase tracking-wider mb-1.5">
-          <EditableText path="personal.fullName" value={data.personal.fullName} />
-        </h1>
-        <div className="text-[10px] text-gray-800 flex flex-wrap justify-center items-center gap-x-2 gap-y-1">
-          {data.personal.email && <span><EditableText path="personal.email" value={data.personal.email} /></span>}
-          {data.personal.phone && <><span className="text-gray-400">|</span> <span><EditableText path="personal.phone" value={data.personal.phone} /></span></>}
-          {data.personal.location && <><span className="text-gray-400">|</span> <span><EditableText path="personal.location" value={data.personal.location} /></span></>}
-          {data.personal.linkedin && <><span className="text-gray-400">|</span> <span><EditableText path="personal.linkedin" value={data.personal.linkedin} /></span></>}
-          {data.personal.github && <><span className="text-gray-400">|</span> <span><EditableText path="personal.github" value={data.personal.github} /></span></>}
+      <div className={`mb-5 pb-4 border-b ${data.personal.photo ? "flex items-center gap-4 text-left" : "text-center"}`}>
+        {data.personal.photo && (
+          <img
+            src={data.personal.photo}
+            alt="Profile"
+            className="w-16 h-16 rounded-full object-cover border-2 flex-shrink-0"
+            style={{ borderColor: custom.primaryColor || "#6366f1" }}
+          />
+        )}
+        <div className={data.personal.photo ? "flex-1" : ""}>
+          <h1 className="text-[22px] font-bold uppercase tracking-wider mb-1.5">
+            <EditableText path="personal.fullName" value={data.personal.fullName} />
+          </h1>
+          <div className={`text-[10px] text-gray-800 flex flex-wrap gap-x-2 gap-y-1 ${data.personal.photo ? "" : "justify-center"}`}>
+            {data.personal.email && <span><EditableText path="personal.email" value={data.personal.email} /></span>}
+            {data.personal.phone && <><span className="text-gray-400">|</span> <span><EditableText path="personal.phone" value={data.personal.phone} /></span></>}
+            {data.personal.location && <><span className="text-gray-400">|</span> <span><EditableText path="personal.location" value={data.personal.location} /></span></>}
+            {data.personal.linkedin && <><span className="text-gray-400">|</span> <span><EditableText path="personal.linkedin" value={data.personal.linkedin} /></span></>}
+            {data.personal.github && <><span className="text-gray-400">|</span> <span><EditableText path="personal.github" value={data.personal.github} /></span></>}
+          </div>
         </div>
       </div>
       

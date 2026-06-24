@@ -6,7 +6,7 @@ import {
   User, GraduationCap, Briefcase, FolderOpen, Wrench,
   Award, Target, ChevronLeft, ChevronRight, Eye, Edit2,
   Download, Printer, Link2, CheckCircle2, LayoutTemplate,
-  ListOrdered, SlidersHorizontal, BarChart2,
+  ListOrdered, SlidersHorizontal, BarChart2, FileText, Palette
 } from "lucide-react";
 
 import ThemeToggle from "../components/ThemeToggle";
@@ -17,6 +17,7 @@ import StepProjects from "../components/wizard/StepProjects";
 import StepSkills from "../components/wizard/StepSkills";
 import StepCertifications from "../components/wizard/StepCertifications";
 import StepTargetJob from "../components/wizard/StepTargetJob";
+import StepJobDescription from "../components/wizard/StepJobDescription";
 import TemplateMeridian from "../components/templates/TemplateMeridian";
 import TemplateClassic from "../components/templates/TemplateClassic";
 import TemplateCorporate from "../components/templates/TemplateCorporate";
@@ -41,6 +42,7 @@ const STEPS = [
   { label: "Skills",          icon: Wrench,         subtitle: "Skills with AI suggestions — for any field" },
   { label: "Certifications",  icon: Award,          subtitle: "Professional certifications and credentials" },
   { label: "Target Job",      icon: Target,         subtitle: "Role (any industry) and AI-generated summary" },
+  { label: "Job Description", icon: FileText,       subtitle: "(Optional) Target job description for live ATS tailoring" },
 ];
 
 const TEMPLATES = [
@@ -59,19 +61,29 @@ const TEMPLATE_MAP: Record<TName, React.ComponentType<{ data: ResumeData }>> = {
   Prism: TemplatePrism,
 };
 
-type PreviewTab = "template" | "sections" | "export" | "ats";
+type PreviewTab = "template" | "sections" | "design" | "export" | "ats";
+
+const PALETTES = {
+  indigo: { primaryColor: "#6366f1", headingColor: "#312e81", textColor: "#1f2937", bgColor: "#ffffff" },
+  classic: { primaryColor: "#000000", headingColor: "#000000", textColor: "#2d3748", bgColor: "#ffffff" },
+  emerald: { primaryColor: "#059669", headingColor: "#064e3b", textColor: "#2d3748", bgColor: "#ffffff" },
+  royal: { primaryColor: "#2563eb", headingColor: "#1e3a8a", textColor: "#1e293b", bgColor: "#ffffff" },
+  rose: { primaryColor: "#e11d48", headingColor: "#881337", textColor: "#374151", bgColor: "#ffffff" },
+  warm: { primaryColor: "#d97706", headingColor: "#78350f", textColor: "#27272a", bgColor: "#fffbeb" },
+  mono: { primaryColor: "#2563eb", headingColor: "#0f172a", textColor: "#334155", bgColor: "#f8fafc" },
+};
 
 // ── Page ───────────────────────────────────────────────────────────────────
 
 const Home: NextPage = () => {
-  const [step, setStep] = useState(0);          // 0–6 wizard, 7 = preview
+  const [step, setStep] = useState(0);
   const [data, setData] = useState<ResumeData>(emptyResume);
   const [template, setTemplate] = useState<TName>("Meridian");
   const [showUpload, setShowUpload] = useState(false);
   const [activeTab, setActiveTab] = useState<PreviewTab>("template");
   const resumeRef = useRef<HTMLDivElement>(null);
 
-  const isPreview = step === 7;
+  const isPreview = step === STEPS.length;
   const TemplateComponent = TEMPLATE_MAP[template];
 
   // Load shareable resume data from URL param
@@ -79,9 +91,10 @@ const Home: NextPage = () => {
     try {
       const q = new URLSearchParams(window.location.search).get("r");
       if (q) {
-        const parsed = JSON.parse(atob(q)) as ResumeData;
+        const decodedString = decodeURIComponent(escape(atob(q)));
+        const parsed = JSON.parse(decodedString) as ResumeData;
         setData(parsed);
-        setStep(7);
+        setStep(STEPS.length);
       }
     } catch {
       // ignore bad param
@@ -92,7 +105,8 @@ const Home: NextPage = () => {
 
   const handleShare = () => {
     try {
-      const encoded = btoa(JSON.stringify(data));
+      const serialized = JSON.stringify(data);
+      const encoded = btoa(unescape(encodeURIComponent(serialized)));
       const url = `${window.location.origin}${window.location.pathname}?r=${encoded}`;
       navigator.clipboard.writeText(url);
       toast.success("Share link copied to clipboard!");
@@ -103,6 +117,91 @@ const Home: NextPage = () => {
 
   const handleEdit = (path: string, value: string) => {
     setData((prev) => updatePath(prev, path, value));
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 120;
+        const MAX_HEIGHT = 120;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.75);
+        setData((prev) => ({
+          ...prev,
+          personal: { ...prev.personal, photo: dataUrl },
+        }));
+        toast.success("Profile photo uploaded!");
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhotoRemove = () => {
+    setData((prev) => ({
+      ...prev,
+      personal: { ...prev.personal, photo: "" },
+    }));
+    toast.success("Profile photo removed!");
+  };
+
+  const handleCustomStyle = (key: string, value: string) => {
+    setData((prev) => ({
+      ...prev,
+      customization: {
+        ...(prev.customization || {
+          fontFamily: 'Inter',
+          theme: 'indigo',
+          primaryColor: '#6366f1',
+          headingColor: '#312e81',
+          textColor: '#1f2937',
+          bgColor: '#ffffff',
+        }),
+        theme: "custom",
+        [key]: value,
+      },
+    }));
+  };
+
+  const handlePresetSelect = (themeName: string, preset: typeof PALETTES.indigo) => {
+    setData((prev) => ({
+      ...prev,
+      customization: {
+        ...(prev.customization || {
+          fontFamily: 'Inter',
+          theme: 'indigo',
+          primaryColor: '#6366f1',
+          headingColor: '#312e81',
+          textColor: '#1f2937',
+          bgColor: '#ffffff',
+        }),
+        ...preset,
+        theme: themeName,
+      },
+    }));
   };
 
   // ── Header ───────────────────────────────────────────────────────────────
@@ -175,7 +274,7 @@ const Home: NextPage = () => {
                 Upload Resume
               </button>
               <button
-                onClick={() => setStep(7)}
+                onClick={() => setStep(STEPS.length)}
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border font-medium transition-all hover:border-indigo-500/60"
                 style={{ borderColor: "var(--border)", color: "var(--text-muted)", background: "var(--bg-elevated)" }}
               >
@@ -304,6 +403,7 @@ const Home: NextPage = () => {
             {step === 4 && <StepSkills        data={data} onChange={setData} />}
             {step === 5 && <StepCertifications data={data} onChange={setData} />}
             {step === 6 && <StepTargetJob     data={data} onChange={setData} />}
+            {step === 7 && <StepJobDescription data={data} onChange={setData} />}
 
             {/* Navigation */}
             <div
@@ -329,7 +429,7 @@ const Home: NextPage = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() => setStep(7)}
+                  onClick={() => setStep(STEPS.length)}
                   className="flex items-center gap-1.5 text-sm px-4 sm:px-5 py-2 rounded-xl font-semibold text-white transition-all active:scale-[0.98]"
                   style={{ background: "linear-gradient(135deg, #6366f1, #4338ca)" }}
                 >
@@ -361,6 +461,7 @@ const Home: NextPage = () => {
   const PREVIEW_TABS: { id: PreviewTab; label: string; icon: React.ElementType }[] = [
     { id: "template", label: "Template",  icon: LayoutTemplate },
     { id: "sections", label: "Sections",  icon: ListOrdered },
+    { id: "design",   label: "Customize", icon: Palette },
     { id: "export",   label: "Export",    icon: SlidersHorizontal },
     { id: "ats",      label: "ATS Score", icon: BarChart2 },
   ];
@@ -467,6 +568,177 @@ const Home: NextPage = () => {
                 order={data.sectionOrder}
                 onChange={(order) => setData(prev => ({ ...prev, sectionOrder: order }))}
               />
+            </div>
+
+            {/* Design / Customize Panel */}
+            <div
+              className={`rounded-2xl border p-4 space-y-4 ${activeTab === "design" ? "block" : "hidden lg:block"}`}
+              style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}
+            >
+              <h3 className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>
+                Custom Styles
+              </h3>
+
+              {/* Profile Photo Section */}
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  Profile Photo
+                </label>
+                <div className="flex items-center gap-3">
+                  {data.personal.photo ? (
+                    <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-300">
+                      <img src={data.personal.photo} className="w-full h-full object-cover" alt="Avatar" />
+                    </div>
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-800 border flex items-center justify-center text-[10px] text-gray-500 font-medium">
+                      No Photo
+                    </div>
+                  )}
+                  <div className="flex-1 space-y-1">
+                    <label className="block text-center py-1.5 px-3 rounded-lg text-xs font-semibold border cursor-pointer hover:bg-indigo-500/10 hover:border-indigo-500/50 transition-all text-indigo-400 border-indigo-500/30">
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+                    {data.personal.photo && (
+                      <button
+                        onClick={handlePhotoRemove}
+                        className="w-full py-1 text-center text-[10px] font-medium text-red-400 hover:underline"
+                      >
+                        Remove Photo
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Font Section */}
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  Font Family
+                </label>
+                <select
+                  value={data.customization?.fontFamily || "Inter"}
+                  onChange={(e) => handleCustomStyle("fontFamily", e.target.value)}
+                  className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500"
+                  style={{ borderColor: "var(--border)", background: "var(--bg-elevated)", color: "var(--text-primary)" }}
+                >
+                  <option value="Inter">Inter (Modern Sans)</option>
+                  <option value="Roboto">Roboto (Clean Sans)</option>
+                  <option value="Outfit">Outfit (Geometrical)</option>
+                  <option value="Playfair Display">Playfair (Elegant Serif)</option>
+                  <option value="Lora">Lora (Classic Serif)</option>
+                  <option value="Merriweather">Merriweather (Read Serif)</option>
+                  <option value="Fira Code">Fira Code (Tech Mono)</option>
+                </select>
+              </div>
+
+              {/* Preset Palettes */}
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  Color Preset
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {Object.entries(PALETTES).map(([key, p]) => (
+                    <button
+                      key={key}
+                      onClick={() => handlePresetSelect(key, p)}
+                      className={`flex flex-col items-center justify-center p-1.5 rounded-lg border text-[9px] font-semibold transition-all ${
+                        data.customization?.theme === key
+                          ? "border-indigo-500 bg-indigo-500/10 text-indigo-400"
+                          : "hover:border-indigo-500/40"
+                      }`}
+                      style={{
+                        borderColor: data.customization?.theme === key ? "" : "var(--border)",
+                        background: "var(--bg-elevated)",
+                        color: data.customization?.theme === key ? "" : "var(--text-muted)"
+                      }}
+                    >
+                      <div className="flex gap-0.5 mb-1">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.primaryColor }} />
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.headingColor }} />
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.textColor }} />
+                      </div>
+                      <span className="capitalize">{key}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fine-tune Custom Colors */}
+              <div className="space-y-2 border-t pt-3" style={{ borderColor: "var(--border)" }}>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                  Adjust Palette
+                </p>
+
+                {/* Primary Accent Color */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>Accent</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={data.customization?.primaryColor || "#6366f1"}
+                      onChange={(e) => handleCustomStyle("primaryColor", e.target.value)}
+                      className="w-5 h-5 rounded border-0 cursor-pointer p-0"
+                    />
+                    <span className="text-[10px] font-mono text-gray-400 uppercase">
+                      {data.customization?.primaryColor}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Headline Color */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>Headings</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={data.customization?.headingColor || "#312e81"}
+                      onChange={(e) => handleCustomStyle("headingColor", e.target.value)}
+                      className="w-5 h-5 rounded border-0 cursor-pointer p-0"
+                    />
+                    <span className="text-[10px] font-mono text-gray-400 uppercase">
+                      {data.customization?.headingColor}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Text Color */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>Text</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={data.customization?.textColor || "#1f2937"}
+                      onChange={(e) => handleCustomStyle("textColor", e.target.value)}
+                      className="w-5 h-5 rounded border-0 cursor-pointer p-0"
+                    />
+                    <span className="text-[10px] font-mono text-gray-400 uppercase">
+                      {data.customization?.textColor}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Background Color */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>Background</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={data.customization?.bgColor || "#ffffff"}
+                      onChange={(e) => handleCustomStyle("bgColor", e.target.value)}
+                      className="w-5 h-5 rounded border-0 cursor-pointer p-0"
+                    />
+                    <span className="text-[10px] font-mono text-gray-400 uppercase">
+                      {data.customization?.bgColor}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Export */}

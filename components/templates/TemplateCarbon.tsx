@@ -158,8 +158,49 @@ export default function TemplateCarbon({ data }: { data: ResumeData }) {
     }
   };
 
+  const custom = data.customization || {
+    fontFamily: 'Inter',
+    primaryColor: '#6366f1',
+    headingColor: '#312e81',
+    textColor: '#1f2937',
+    bgColor: '#ffffff',
+  };
+
   return (
-    <div className="p-8 bg-white text-black font-sans" style={{ width: "100%", minHeight: "100%" }}>
+    <div className="p-8 bg-white text-black resume-custom-container" style={{ width: "100%", minHeight: "100%" }}>
+      <style>{`
+        .resume-custom-container {
+          font-family: ${custom.fontFamily || 'Inter'}, sans-serif !important;
+          background-color: ${custom.bgColor || '#ffffff'} !important;
+          color: ${custom.textColor || '#1f2937'} !important;
+        }
+        .resume-custom-container h1,
+        .resume-custom-container h2,
+        .resume-custom-container .resume-section-heading {
+          color: ${custom.headingColor || '#000000'} !important;
+          border-color: ${custom.primaryColor || '#000000'} !important;
+        }
+        .resume-custom-container h3,
+        .resume-custom-container .text-indigo-600,
+        .resume-custom-container .text-blue-600 {
+          color: ${custom.primaryColor || '#6366f1'} !important;
+        }
+        .resume-custom-container p,
+        .resume-custom-container span,
+        .resume-custom-container div,
+        .resume-custom-container li {
+          color: ${custom.textColor || '#1f2937'} !important;
+        }
+        .resume-custom-container .text-gray-400 {
+          color: ${custom.primaryColor || '#9ca3af'} !important;
+          opacity: 0.5;
+        }
+        .resume-custom-container .border-indigo-500,
+        .resume-custom-container .border-blue-500,
+        .resume-custom-container .border-black {
+          border-color: ${custom.primaryColor || '#6366f1'} !important;
+        }
+      `}</style>
       {/* Header */}
       <div className="mb-8 border-l-4 border-gray-900 pl-4 text-left">
         <h1 className="text-[22px] font-bold uppercase tracking-wider mb-1.5">

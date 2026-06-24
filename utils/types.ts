@@ -9,6 +9,16 @@ export interface PersonalInfo {
   linkedin: string;
   github: string;
   portfolio: string;
+  photo?: string;
+}
+
+export interface ResumeCustomization {
+  fontFamily: string;
+  theme: string;
+  primaryColor: string;
+  headingColor: string;
+  textColor: string;
+  bgColor: string;
 }
 
 export interface Education {
@@ -66,12 +76,14 @@ export interface ResumeData {
   targetJob: { jobDescription: string; role: string };
   summary: string;
   sectionOrder: string[];
+  customization?: ResumeCustomization;
 }
 
 export const emptyResume: ResumeData = {
   personal: {
     fullName: '', title: '', email: '', phone: '',
     location: '', linkedin: '', github: '', portfolio: '',
+    photo: '',
   },
   education: [],
   experience: [],
@@ -81,6 +93,14 @@ export const emptyResume: ResumeData = {
   targetJob: { jobDescription: '', role: '' },
   summary: '',
   sectionOrder: [...DEFAULT_SECTION_ORDER],
+  customization: {
+    fontFamily: 'Inter',
+    theme: 'indigo',
+    primaryColor: '#6366f1',
+    headingColor: '#312e81',
+    textColor: '#1f2937',
+    bgColor: '#ffffff',
+  },
 };
 
 // ── AI streaming helper ────────────────────────────────────────────────────

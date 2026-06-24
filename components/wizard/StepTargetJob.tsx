@@ -107,15 +107,12 @@ export default function StepTargetJob({
   data: ResumeData;
   onChange: (d: ResumeData) => void;
 }) {
-  const [mode, setMode] = useState<"role" | "jd">("role");
   const [generating, setGenerating] = useState(false);
   const [search, setSearch] = useState("");
   const { targetJob } = data;
 
   const setRole = (role: string) =>
     onChange({ ...data, targetJob: { ...targetJob, role } });
-  const setJD = (jobDescription: string) =>
-    onChange({ ...data, targetJob: { ...targetJob, jobDescription } });
 
   const generateSummary = async () => {
     setGenerating(true);
@@ -146,141 +143,99 @@ export default function StepTargetJob({
 
   return (
     <div className="space-y-5">
-      {/* Mode toggle */}
-      <div className="flex rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-        {(["role", "jd"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-              mode === m ? "bg-indigo-500 text-white" : "hover:text-indigo-400"
-            }`}
-            style={
-              mode !== m
-                ? { background: "var(--bg-elevated)", color: "var(--text-muted)" }
-                : {}
-            }
-          >
-            {m === "role" ? "Choose / Enter Role" : "Paste Job Description"}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Option A: Role picker ──────────────────────────────────────────── */}
-      {mode === "role" && (
-        <div className="space-y-3">
-          {/* Search + custom input */}
-          <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && search.trim()) {
-                  setRole(search.trim());
-                  setSearch("");
-                }
-              }}
-              placeholder="Search roles or type a custom role & press Enter…"
-              className={ta}
-              style={{
-                paddingLeft: "2rem",
-                background: "var(--bg-elevated)",
-                borderColor: "var(--border)",
-                color: "var(--text-primary)",
-              }}
-            />
-          </div>
-
-          {/* Custom role suggestion */}
-          {isCustomRole && (
-            <button
-              onClick={() => { setRole(search.trim()); setSearch(""); }}
-              className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-medium border border-dashed border-indigo-500/60 bg-indigo-500/10 text-indigo-400 transition-all hover:bg-indigo-500/20"
-            >
-              ＋ Use &ldquo;{search.trim()}&rdquo; as custom role
-            </button>
-          )}
-
-          {/* Selected role badge */}
-          {targetJob.role && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                Selected:
-              </span>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-                {targetJob.role}
-              </span>
-              <button
-                onClick={() => setRole("")}
-                className="text-xs ml-auto"
-                style={{ color: "var(--text-muted)" }}
-              >
-                ✕ Clear
-              </button>
-            </div>
-          )}
-
-          {/* Role categories */}
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-            {filteredCategories.map((cat) =>
-              cat.roles.length === 0 ? null : (
-                <div key={cat.category}>
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "var(--text-muted)" }}>
-                    {cat.category}
-                  </p>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {cat.roles.map((r) => (
-                      <button
-                        key={r}
-                        onClick={() => { setRole(r); setSearch(""); }}
-                        className={`py-2 px-2.5 rounded-lg text-xs font-medium border transition-all text-left truncate ${
-                          targetJob.role === r
-                            ? "border-indigo-500 bg-indigo-500/15 text-indigo-400"
-                            : "hover:border-indigo-500/50 hover:text-indigo-400"
-                        }`}
-                        style={
-                          targetJob.role !== r
-                            ? { borderColor: "var(--border)", color: "var(--text-primary)", background: "var(--bg-elevated)" }
-                            : {}
-                        }
-                      >
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )
-            )}
-            {filteredCategories[0]?.roles.length === 0 && (
-              <p className="text-sm text-center py-4" style={{ color: "var(--text-muted)" }}>
-                No roles match &ldquo;{search}&rdquo; — press Enter to use it as a custom role.
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── Option B: JD paste ────────────────────────────────────────────── */}
-      {mode === "jd" && (
-        <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: "var(--text-muted)" }}>
-            Full Job Description
-          </label>
-          <textarea
-            value={targetJob.jobDescription}
-            onChange={(e) => setJD(e.target.value)}
-            placeholder="Paste the full job description here. The AI will generate a tailored summary and the ATS panel will score your resume against this job."
-            rows={8}
+      {/* ── Role picker ──────────────────────────────────────────── */}
+      <div className="space-y-3">
+        {/* Search + custom input */}
+        <div className="relative">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--text-muted)" }} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && search.trim()) {
+                setRole(search.trim());
+                setSearch("");
+              }
+            }}
+            placeholder="Search roles or type a custom role & press Enter…"
             className={ta}
-            style={{ background: "var(--bg-elevated)", borderColor: "var(--border)", color: "var(--text-primary)", resize: "vertical" }}
+            style={{
+              paddingLeft: "2rem",
+              background: "var(--bg-elevated)",
+              borderColor: "var(--border)",
+              color: "var(--text-primary)",
+            }}
           />
-          <p className="text-xs mt-1.5" style={{ color: "var(--text-muted)" }}>
-            {targetJob.jobDescription.length} characters — longer descriptions yield better ATS scores
-          </p>
         </div>
-      )}
+
+        {/* Custom role suggestion */}
+        {isCustomRole && (
+          <button
+            onClick={() => { setRole(search.trim()); setSearch(""); }}
+            className="w-full text-left py-2.5 px-3 rounded-xl text-sm font-medium border border-dashed border-indigo-500/60 bg-indigo-500/10 text-indigo-400 transition-all hover:bg-indigo-500/20"
+          >
+            ＋ Use &ldquo;{search.trim()}&rdquo; as custom role
+          </button>
+        )}
+
+        {/* Selected role badge */}
+        {targetJob.role && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+              Selected:
+            </span>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              {targetJob.role}
+            </span>
+            <button
+              onClick={() => setRole("")}
+              className="text-xs ml-auto"
+              style={{ color: "var(--text-muted)" }}
+            >
+              ✕ Clear
+            </button>
+          </div>
+        )}
+
+        {/* Role categories */}
+        <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+          {filteredCategories.map((cat) =>
+            cat.roles.length === 0 ? null : (
+              <div key={cat.category}>
+                <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: "var(--text-muted)" }}>
+                  {cat.category}
+                </p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {cat.roles.map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => { setRole(r); setSearch(""); }}
+                      className={`py-2 px-2.5 rounded-lg text-xs font-medium border transition-all text-left truncate ${
+                        targetJob.role === r
+                          ? "border-indigo-500 bg-indigo-500/15 text-indigo-400"
+                          : "hover:border-indigo-500/50 hover:text-indigo-400"
+                      }`}
+                      style={
+                        targetJob.role !== r
+                          ? { borderColor: "var(--border)", color: "var(--text-primary)", background: "var(--bg-elevated)" }
+                          : {}
+                      }
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
+          )}
+          {filteredCategories[0]?.roles.length === 0 && (
+            <p className="text-sm text-center py-4" style={{ color: "var(--text-muted)" }}>
+              No roles match &ldquo;{search}&rdquo; — press Enter to use it as a custom role.
+            </p>
+          )}
+        </div>
+      </div>
 
       {/* ── Professional Summary ──────────────────────────────────────────── */}
       <div className="rounded-2xl border p-4 space-y-3" style={{ background: "var(--bg-elevated)", borderColor: "var(--border)" }}>
