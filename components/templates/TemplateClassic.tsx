@@ -7,8 +7,8 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'summary':
         if (!data.summary) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
               Professional Summary
             </h2>
             <div className="text-[10px] text-gray-800 leading-snug">
@@ -19,13 +19,13 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'experience':
         if (!data.experience.length) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
               Work Experience
             </h2>
             <div className="space-y-3">
               {data.experience.map((exp, i) => (
-                <div key={exp.id}>
+                <div key={exp.id} className="resume-entry">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <h3 className="text-[10.5px] font-bold text-black">
                       <EditableText path={`experience.${i}.role`} value={exp.role} />
@@ -54,13 +54,13 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'education':
         if (!data.education.length) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
               Education
             </h2>
             <div className="space-y-2">
               {data.education.map((edu, i) => (
-                <div key={edu.id} className="flex justify-between items-baseline">
+                <div key={edu.id} className="flex justify-between items-baseline resume-entry">
                   <div>
                     <h3 className="text-[10.5px] font-bold text-black">
                       <EditableText path={`education.${i}.degree`} value={edu.degree} />
@@ -85,13 +85,13 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'projects':
         if (!data.projects.length) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
               Projects
             </h2>
             <div className="space-y-3">
               {data.projects.map((proj, i) => (
-                <div key={proj.id}>
+                <div key={proj.id} className="resume-entry">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <h3 className="text-[10.5px] font-bold text-black">
                       <EditableText path={`projects.${i}.name`} value={proj.name} />
@@ -113,9 +113,9 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'skills':
         if (!data.skills.length) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
-              Technical Skills
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
+              Skills
             </h2>
             <div className="text-[10px] text-gray-800 leading-snug flex flex-wrap gap-x-1.5 gap-y-1">
               {data.skills.map((skill, i) => (
@@ -130,13 +130,13 @@ export default function TemplateClassic({ data }: { data: ResumeData }) {
       case 'certifications':
         if (!data.certifications.length) return null;
         return (
-          <div key={id} className="mb-4">
-            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5">
+          <div key={id} className="mb-4 resume-section">
+            <h2 className="text-[11px] font-bold uppercase tracking-widest text-black border-b border-black mb-2 pb-0.5 resume-section-heading">
               Certifications
             </h2>
             <div className="space-y-2">
               {data.certifications.map((cert, i) => (
-                <div key={cert.id} className="flex justify-between items-baseline">
+                <div key={cert.id} className="flex justify-between items-baseline resume-entry">
                   <div>
                     <h3 className="text-[10.5px] font-bold text-black">
                       <EditableText path={`certifications.${i}.name`} value={cert.name} />

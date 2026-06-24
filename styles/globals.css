@@ -61,6 +61,22 @@
     margin: 0;
     size: A4;
   }
+
+  /* ── Page break prevention — no content splits mid-entry ── */
+  .resume-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .resume-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  .resume-section-heading {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
 }
 
 /* ── Scrollbar styling (dark mode) ─────────────────── */
@@ -76,4 +92,39 @@
 }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #404040;
+}
+
+/* ── Mobile preview tab bar ─────────────────────────── */
+.preview-tabs {
+  display: none;
+}
+@media (max-width: 768px) {
+  .preview-tabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
+    scrollbar-width: none;
+  }
+  .preview-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .preview-left-panel {
+    display: none;
+  }
+  .preview-left-panel.active {
+    display: block;
+    width: 100% !important;
+  }
+  .preview-resume-wrapper {
+    overflow-x: auto;
+  }
+}
+
+/* ── Resume scale wrapper for mobile ────────────────── */
+.resume-scale-container {
+  width: 100%;
+  overflow: hidden;
 }
