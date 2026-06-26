@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 270" width="440" height="270">
+  <!-- tdc. wordmark -->
+  <!-- t -->
+  <path d="M30 60 L30 30 L80 30 L80 60 L65 60 L65 195 Q65 215 78 225 Q88 232 105 232 L105 265 Q68 265 49 248 Q30 230 30 195 L30 60 Z" fill="#1a1a1a"/>
+  <!-- crossbar of t -->
+  <rect x="0" y="95" width="110" height="32" fill="#1a1a1a"/>
+
+  <!-- d -->
+  <rect x="125" y="30" width="38" height="235" fill="#1a1a1a"/>
+  <path d="M163 75 Q205 75 228 105 Q248 132 248 162 Q248 195 226 220 Q204 245 163 245 L163 210 Q188 210 200 194 Q212 178 212 162 Q212 147 201 132 Q190 117 163 115 Z" fill="#1a1a1a"/>
+
+  <!-- c -->
+  <path d="M360 85 Q335 85 318 102 Q300 120 300 162 Q300 204 318 222 Q336 240 360 240 Q380 240 394 228 L415 255 Q393 275 360 275 Q320 275 294 248 Q265 220 265 162 Q265 104 293 77 Q320 50 360 50 Q394 50 416 70 L395 98 Q382 85 360 85 Z" fill="#1a1a1a"/>
+
+  <!-- dot after c -->
+  <circle cx="430" cy="242" r="22" fill="#1a1a1a"/>
+
+  <!-- tagline: THE DEFT CREW -->
+  <text x="10" y="295" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="400" letter-spacing="5" fill="#555555">THE DEFT CREW</text>
+</svg>

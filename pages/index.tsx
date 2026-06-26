@@ -6,7 +6,7 @@ import {
   User, GraduationCap, Briefcase, FolderOpen, Wrench,
   Award, Target, ChevronLeft, ChevronRight, Eye, Edit2,
   Download, Printer, Link2, CheckCircle2, LayoutTemplate,
-  ListOrdered, SlidersHorizontal, BarChart2, FileText, Palette
+  ListOrdered, SlidersHorizontal, BarChart2, FileText, Palette, Upload
 } from "lucide-react";
 
 import ThemeToggle from "../components/ThemeToggle";
@@ -394,6 +394,39 @@ const Home: NextPage = () => {
               </div>
               <p className="text-xs sm:text-sm pl-9" style={{ color: "var(--text-muted)" }}>{STEPS[step].subtitle}</p>
             </div>
+
+            {/* Upload resume shortcut — shown only on step 0 */}
+            {step === 0 && (
+              <div
+                className="mb-5 rounded-xl border-2 border-dashed p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3"
+                style={{ borderColor: "rgba(99,102,241,0.35)", background: "rgba(99,102,241,0.04)" }}
+              >
+                <div className="flex-1">
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                    Already have a resume?
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                    Upload it and AI will auto-fill all fields — no manual typing needed.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => setShowUpload(true)}
+                    className="flex items-center gap-1.5 text-xs px-3.5 py-2 rounded-lg font-semibold text-white transition-all active:scale-[0.98] hover:opacity-90"
+                    style={{ background: "linear-gradient(135deg, #6366f1, #4338ca)" }}
+                  >
+                    <Upload size={12} /> Upload &amp; Auto-fill
+                  </button>
+                  <button
+                    onClick={() => setStep(STEPS.length)}
+                    className="text-xs px-3 py-2 rounded-lg border font-medium transition-all hover:border-indigo-500/50"
+                    style={{ borderColor: "var(--border)", color: "var(--text-muted)", background: "var(--bg-elevated)" }}
+                  >
+                    Skip to Preview
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Render step */}
             {step === 0 && <StepPersonal      data={data} onChange={setData} />}

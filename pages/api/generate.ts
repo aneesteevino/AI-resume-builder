@@ -15,7 +15,7 @@ interface ActionSettings {
 
 function actionSettings(action: string): ActionSettings {
   if (action === 'regenFromUpload') return { maxTokens: 3500, temperature: 0.2 };
-  if (action === 'summary' || action === 'tailor') return { maxTokens: 700, temperature: 0.7 };
+  if (action === 'summary' || action === 'tailor') return { maxTokens: 1200, temperature: 0.65 };
   return { maxTokens: 700, temperature: 0.7 };
 }
 
@@ -24,9 +24,10 @@ function actionSettings(action: string): ActionSettings {
 function buildPrompt(action: string, data: Record<string, unknown>): string {
   switch (action) {
     case "summary":
-      return `You are a professional resume writer. Write a concise 3–5 sentence ATS-optimized professional summary. Return only the paragraph text, no labels or bullet points.
+      return `You are a professional resume writer. Write an ATS-optimized professional summary paragraph of exactly 6–8 sentences (approximately 7 lines when printed). The summary MUST be based ONLY on the actual information provided below — do not invent achievements, metrics, companies, or skills that are not listed. Write it as a single flowing paragraph (no bullets, no headers). Return only the paragraph text.
 
-Candidate: ${(data.personal as { fullName?: string; title?: string })?.fullName ?? ""}, ${(data.personal as { fullName?: string; title?: string })?.title ?? ""}
+Candidate Name: ${(data.personal as { fullName?: string; title?: string })?.fullName ?? ""}
+Professional Title: ${(data.personal as { fullName?: string; title?: string })?.title ?? ""}
 Target Role: ${(data.targetJob as { role?: string; jobDescription?: string })?.role ?? ""}
 Job Context: ${((data.targetJob as { jobDescription?: string })?.jobDescription ?? "").slice(0, 300)}
 Skills: ${((data.skills as string[]) ?? []).join(", ")}
